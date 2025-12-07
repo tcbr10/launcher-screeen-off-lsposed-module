@@ -34,3 +34,13 @@ android {
 dependencies {
     compileOnly 'de.robv.android.xposed:api:82'
 }
+
+signingConfigs {
+    release {
+        // 'file' looks relative to the app/ build.gradle location
+        storeFile file("release.jks")
+        storePassword "password123"
+        keyAlias "key0"
+        keyPassword "password123"
+    }
+}
