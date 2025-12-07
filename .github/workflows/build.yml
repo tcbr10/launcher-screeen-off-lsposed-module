@@ -1,0 +1,45 @@
+name: Build LSPosed Module
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Generate Keystore
+      run: |
+        cd app
+        keytool -genkey -v -keystore release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias key0 -storepass password123 -keypass password123 -dname "CN=DoovFix, OU=Dev, O=Company, L=Loc, S=State, C=US"
+        echo "Keystore generated at app/release.jks"
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+      
+    # Fallback to gradle command if gradlew wrapper is missing
+    - name: Build with Gradle
+      run: ./gradlew assembleRelease || gradle assembleRelease
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: DoovFix-LSPosed-Module
+        path: app/build/outputs/apk/release/app-release.apk
