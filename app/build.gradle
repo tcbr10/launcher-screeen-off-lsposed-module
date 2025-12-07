@@ -2,7 +2,7 @@ plugins {
     id 'com.android.application'
 }
 
-android {
+android { // <-- signingConfigs must go inside here
     namespace 'com.monobogdan.doovfix'
     compileSdk 34
 
@@ -13,7 +13,8 @@ android {
         versionCode 1
         versionName "1.0"
     }
-
+    
+    // Correct placement for signingConfigs
     signingConfigs {
         release {
             storeFile file("release.jks")
@@ -29,18 +30,8 @@ android {
             signingConfig signingConfigs.release
         }
     }
-}
+} // <-- End of the android block
 
 dependencies {
     compileOnly 'de.robv.android.xposed:api:82'
-}
-
-signingConfigs {
-    release {
-        // 'file' looks relative to the app/ build.gradle location
-        storeFile file("release.jks")
-        storePassword "password123"
-        keyAlias "key0"
-        keyPassword "password123"
-    }
 }
