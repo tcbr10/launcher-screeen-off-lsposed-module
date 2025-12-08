@@ -26,14 +26,23 @@ public class ButtonHook implements IXposedHookLoadPackage {
                 if (count != 1) return;
 
                 Context context = (Context) XposedHelpers.getObjectField(param.thisObject, "mContext");
+                
+                // CHECK: Is the screen actually on?
+                PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+                if (!pm.isInteractive()) {
+                    // Screen is off/waking up. Do NOT run our lock logic.
+                    // Let the default system behavior (wake up) happen.
+                    return;
+                }
+
                 ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
                 List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
                 
                 if (tasks != null && !tasks.isEmpty()) {
                     String topPackage = tasks.get(0).topActivity.getPackageName();
                     if ("com.monobogdan.monolaunch".equals(topPackage)) {
-          Object powerManager = context.getSystemService(Context.POWER_SERVICE);
-XposedHelpers.callMethod(powerManager, "goToSleep", SystemClock.uptimeMillis()); param.setResult(null); 
+                        XposedHelpers.callMethod(pm, "goToSleep", SystemClock.uptimeMillis());
+                        param.setResult(null); 
                     }
                 }
             }
