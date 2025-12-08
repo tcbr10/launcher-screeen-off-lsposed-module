@@ -32,9 +32,8 @@ public class ButtonHook implements IXposedHookLoadPackage {
                 if (tasks != null && !tasks.isEmpty()) {
                     String topPackage = tasks.get(0).topActivity.getPackageName();
                     if ("com.monobogdan.monolaunch".equals(topPackage)) {
-                        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-                        pm.goToSleep(SystemClock.uptimeMillis());
-                        param.setResult(null); 
+          Object powerManager = context.getSystemService(Context.POWER_SERVICE);
+XposedHelpers.callMethod(powerManager, "goToSleep", SystemClock.uptimeMillis()); param.setResult(null); 
                     }
                 }
             }
